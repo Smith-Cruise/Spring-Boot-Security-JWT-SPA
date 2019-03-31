@@ -4,8 +4,9 @@
 
  我之前写过两篇关于安全框架的问题，大家可以大致看一看，打下基础。
 
-[Shiro+JWT+Spring Boot Restful简易教程]: https://github.com/Smith-Cruise/Spring-Boot-Shiro	"Shiro+JWT+Spring Boot Restful简易教程"
-[Spring Boot+Spring Security+Thymeleaf 简单教程]: https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo	"Spring Boot+Spring Security+Thymeleaf 简单教程"
+ [Shiro+JWT+Spring Boot Restful简易教程](https://github.com/Smith-Cruise/Spring-Boot-Shiro "Shiro+JWT+Spring Boot Restful简易教程")
+
+ [Spring Boot+Spring Security+Thymeleaf 简单教程](https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo "Spring Boot+Spring Security+Thymeleaf 简单教程")
 
 在开始前你至少需要了解 `Spring Security` 的基本配置和 `JWT` 机制。
 
@@ -19,7 +20,7 @@
 
 同时默认的 `Spring Security` 鉴定用户是使用了 `ProviderManager` 这个类进行判断，同时 `ProviderManager` 会调用 `AuthenticationUserDetailsService` 这个接口中的 `UserDetails loadUserDetails(T token) throws UsernameNotFoundException` 来从数据库中获取用户信息（这个方法需要用户自己继承实现）。因为考虑到自带的实现方式并不能很好的支持JWT，例如 `UsernamePasswordAuthenticationToken`  中有 `username` 和 `password` 字段进行赋值，但是 `JWT` 是附带在请求的 `header` 中，只有一个 token ，何来 `username` 和 `password` 这种说法。
 
-所以我对其进行了大换血，例如获取用户的方法并没有在 `AuthenticationUserDetailsService` ` 中实现，但这样就可能不能完美的遵守 `Spring Security` 的官方设计，如果有更好的方法请指正。
+所以我对其进行了大换血，例如获取用户的方法并没有在 `AuthenticationUserDetailsService`  中实现，但这样就可能不能完美的遵守 `Spring Security` 的官方设计，如果有更好的方法请指正。
 
 ## 改造
 
@@ -54,7 +55,7 @@ public interface Authentication extends Principal, Serializable {
 
 **JWTAuthenticationToken**
 
-我们编写属于自己的 `Authentication` ，注意*两个构造方法的不同*
+我们编写属于自己的 `Authentication` ，注意***两个构造方法的不同***
 
 ```java
 public class JWTAuthenticationToken extends AbstractAuthenticationToken {
@@ -221,7 +222,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-关于*方法注解鉴权* 这块有很多奇淫巧技，可以看看 [Spring Boot+Spring Security+Thymeleaf 简单教程](https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo#spring-security-%E9%85%8D%E7%BD%AE "Spring Boot+Spring Security+Thymeleaf 简单教程") 这篇文章
+关于***方法注解鉴权*** 这块有很多奇淫巧技，可以看看 [Spring Boot+Spring Security+Thymeleaf 简单教程](https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo#spring-security-%E9%85%8D%E7%BD%AE "Spring Boot+Spring Security+Thymeleaf 简单教程") 这篇文章
 
 ## 统一全局异常
 
