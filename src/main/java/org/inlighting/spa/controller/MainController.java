@@ -19,18 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MainController {
 
-    /**
-     * JWT refresh
-     */
-
     @Autowired
     private UserService userService;
 
-    @GetMapping("test")
-    public void test() throws Exception {
-        throw new Exception("h");
-    }
-
+    // 登入，获取token
     @PostMapping("login")
     public ResponseEntity<ResponseBean> login(@RequestParam String username, @RequestParam String password) {
         UserEntity userEntity = userService.getUser(username);
@@ -43,6 +35,7 @@ public class MainController {
         return new ResponseEntity<>(new ResponseBean(HttpStatus.OK.value(), "login success", token), HttpStatus.OK);
     }
 
+    // 任何人都可以访问，在方法中判断用户是否合法
     @GetMapping("everyone")
     public ResponseEntity<ResponseBean> everyone() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,7 +46,6 @@ public class MainController {
             return new ResponseEntity<>(new ResponseBean(HttpStatus.OK.value(), "You are anonymous", null), HttpStatus.OK);
         }
     }
-
 
     @GetMapping("user")
     @PreAuthorize("hasAuthority('ROLE_USER')")

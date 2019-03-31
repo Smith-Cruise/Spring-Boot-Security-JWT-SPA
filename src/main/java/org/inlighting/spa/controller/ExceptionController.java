@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionController {
 
-    // 捕捉其他所有异常
+    // 捕捉控制器里面自己抛出的所有异常
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseBean> globalException(Exception ex) {
         return new ResponseEntity<>(

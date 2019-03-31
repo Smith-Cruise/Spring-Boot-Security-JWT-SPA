@@ -14,6 +14,10 @@ import java.io.IOException;
 
 public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
 
+    /**
+     * 使用我们自己开发的JWTAuthenticationManager
+     * @param authenticationManager 我们自己开发的JWTAuthenticationManager
+     */
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
@@ -29,10 +33,13 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
         try {
             String token = header.split(" ")[1];
             JWTAuthenticationToken JWToken = new JWTAuthenticationToken(token);
+            // 鉴定权限，如果鉴定失败，AuthenticationManager会抛出异常被我们捕获
             Authentication authResult = getAuthenticationManager().authenticate(JWToken);
+            // 将鉴定成功后的Authentication写入SecurityContextHolder中供后序使用
             SecurityContextHolder.getContext().setAuthentication(authResult);
         } catch (AuthenticationException failed) {
             SecurityContextHolder.clearContext();
+            // 返回鉴权失败
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
             return;
         }
