@@ -36,6 +36,8 @@
 
 `getDetails()` 原本返回一些客户端 `IP` 等杂项，但是考虑到这里基本都是  `restful` 这类无状态请求，这个就显的无关紧要 ，所以就被阉割了:happy:
 
+**默认提供的Authentication接口**
+
 ```java
 public interface Authentication extends Principal, Serializable {
 
@@ -55,7 +57,7 @@ public interface Authentication extends Principal, Serializable {
 
 **JWTAuthenticationToken**
 
-我们编写属于自己的 `Authentication` ，注意***两个构造方法的不同***
+我们编写属于自己的 `Authentication` ，注意***两个构造方法的不同***。 `AbstractAuthenticationToken` 是官方实现 `Authentication` 的一个类。
 
 ```java
 public class JWTAuthenticationToken extends AbstractAuthenticationToken {
