@@ -2,6 +2,8 @@
 
 ## 准备
 
+项目GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
+
  我之前写过两篇关于安全框架的问题，大家可以大致看一看，打下基础。
 
  [Shiro+JWT+Spring Boot Restful简易教程](https://github.com/Smith-Cruise/Spring-Boot-Shiro "Shiro+JWT+Spring Boot Restful简易教程")
