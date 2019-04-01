@@ -1,4 +1,4 @@
-# Spring Boot 2 + Spring Security 5 + JWT 的单页应用解决方案
+# Spring Boot 2 + Spring Security 5 + JWT 的单页应用Restful解决方案
 
 ## 准备
 
