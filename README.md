@@ -59,7 +59,7 @@ public interface Authentication extends Principal, Serializable {
 
 **JWTAuthenticationToken**
 
-我们编写属于自己的 `Authentication` ，注意***两个构造方法的不同***。 `AbstractAuthenticationToken` 是官方实现 `Authentication` 的一个类。
+我们编写属于自己的 `Authentication` ，注意**两个构造方法的不同**。 `AbstractAuthenticationToken` 是官方实现 `Authentication` 的一个类。
 
 ```java
 public class JWTAuthenticationToken extends AbstractAuthenticationToken {
@@ -226,7 +226,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-关于***方法注解鉴权*** 这块有很多奇淫巧技，可以看看 [Spring Boot+Spring Security+Thymeleaf 简单教程](https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo#spring-security-%E9%85%8D%E7%BD%AE "Spring Boot+Spring Security+Thymeleaf 简单教程") 这篇文章
+关于**方法注解鉴权** 这块有很多奇淫巧技，可以看看 [Spring Boot+Spring Security+Thymeleaf 简单教程](https://github.com/Smith-Cruise/Spring-Boot-Security-Thymeleaf-Demo#spring-security-%E9%85%8D%E7%BD%AE "Spring Boot+Spring Security+Thymeleaf 简单教程") 这篇文章
 
 ## 统一全局异常
 
