@@ -18,7 +18,7 @@
 
 ## 改造思路
 
-平常我们使用 `Spring Security` 会用到 `UsernamePasswordAuthenticationFilter` 和 `UsernamePasswordAuthenticationToken` 这两个类，但这两个类初衷是为了解决表单登入，对 `JWT` 这类 `Token` 鉴权的方式并不是很友好。所以我们要开发属于自己的 `Filter` 和 `AuthenticationToken 来替换掉 ` `Spring Security` 自带的类。
+平常我们使用 `Spring Security` 会用到 `UsernamePasswordAuthenticationFilter` 和 `UsernamePasswordAuthenticationToken` 这两个类，但这两个类初衷是为了解决表单登入，对 `JWT` 这类 `Token` 鉴权的方式并不是很友好。所以我们要开发属于自己的 `Filter` 和 `AuthenticationToken` 来替换掉  `Spring Security` 自带的类。
 
 同时默认的 `Spring Security` 鉴定用户是使用了 `ProviderManager` 这个类进行判断，同时 `ProviderManager` 会调用 `AuthenticationUserDetailsService` 这个接口中的 `UserDetails loadUserDetails(T token) throws UsernameNotFoundException` 来从数据库中获取用户信息（这个方法需要用户自己继承实现）。因为考虑到自带的实现方式并不能很好的支持JWT，例如 `UsernamePasswordAuthenticationToken`  中有 `username` 和 `password` 字段进行赋值，但是 `JWT` 是附带在请求的 `header` 中，只有一个 token ，何来 `username` 和 `password` 这种说法。
 
