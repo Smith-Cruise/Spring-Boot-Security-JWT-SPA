@@ -1,18 +1,21 @@
-package org.inlighting.spa;
+package org.inlighting.security.entity;
 
+public class ResponseEntity {
 
-public class ResponseBean {
+    public ResponseEntity() {
+    }
+
+    public ResponseEntity(int status, String msg, Object data) {
+        this.status = status;
+        this.msg = msg;
+        this.data = data;
+    }
+
     private int status;
 
     private String msg;
 
     private Object data;
-
-    public ResponseBean(int status, String msg, Object data) {
-        this.status = status;
-        this.msg = msg;
-        this.data = data;
-    }
 
     public int getStatus() {
         return status;

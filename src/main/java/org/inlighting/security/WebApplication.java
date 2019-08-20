@@ -1,13 +1,13 @@
-package org.inlighting.spa;
+package org.inlighting.security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringSecuritySPAApplication {
+public class WebApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringSecuritySPAApplication.class, args);
+        SpringApplication.run(WebApplication.class, args);
     }
 
 }
