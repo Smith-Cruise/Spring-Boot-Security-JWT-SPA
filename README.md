@@ -4,6 +4,8 @@
 
 项目GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
 
+之前一篇文章：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md)
+
 ## 特性
 
 * 使用 JWT 进行鉴权，支持过期控制
