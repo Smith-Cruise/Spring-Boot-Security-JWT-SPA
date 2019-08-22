@@ -1,5 +1,13 @@
 # Spring Boot 2 + Spring Security 5 + JWT 的单页应用Restful解决方案
 
+此前我已经写过一篇类似的教程，但那时候使用了投机的方法，没有尊重 Spring Security 的官方设计，自己并不感到满意。这段时间比较空，故重新研究了一遍。
+
+## 特性
+
+* 使用 JWT 进行鉴权
+* 使用 Ehcache 实现缓存，减少每次鉴权对数据库的压力
+* 尽可能贴合 Spring Security 的设计
+
 ## 准备
 
 项目GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)

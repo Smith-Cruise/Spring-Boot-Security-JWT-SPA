@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     // 过期时间5分钟
-    private final static  long EXPIRE_TIME = 5*60*1000;
+    private final static long EXPIRE_TIME = 5 * 60 * 1000;
 
     /**
      * 生成签名,5min后过期

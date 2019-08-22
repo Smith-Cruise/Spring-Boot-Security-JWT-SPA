@@ -1,0 +1,14 @@
+<ehcache:config
+        xmlns:ehcache="http://www.ehcache.org/v3"
+        xmlns:jcache="http://www.ehcache.org/v3/jsr107">
+
+    <ehcache:cache alias="jwt-cache">
+        <ehcache:key-type>java.lang.String</ehcache:key-type>
+        <ehcache:value-type>org.springframework.security.core.userdetails.User</ehcache:value-type>
+        <ehcache:expiry>
+            <ehcache:ttl unit="days">1</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:heap unit="entries">2000</ehcache:heap>
+    </ehcache:cache>
+
+</ehcache:config>

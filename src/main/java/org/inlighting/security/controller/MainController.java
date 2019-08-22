@@ -1,8 +1,10 @@
 package org.inlighting.security.controller;
 
 import org.inlighting.security.entity.ResponseEntity;
+import org.inlighting.security.security.IsAdmin;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +19,7 @@ public class MainController {
     @GetMapping("everyone")
     public ResponseEntity everyone() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated()) {
+        if (! (authentication instanceof AnonymousAuthenticationToken)) {
             // 登入用户
             return new ResponseEntity(HttpStatus.OK.value(), "You are already login", authentication.getPrincipal());
         } else {
@@ -32,7 +34,7 @@ public class MainController {
     }
 
     @GetMapping("admin")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @IsAdmin
     public ResponseEntity admin(@AuthenticationPrincipal UsernamePasswordAuthenticationToken token) {
         return new ResponseEntity(HttpStatus.OK.value(), "You are admin", token);
     }
