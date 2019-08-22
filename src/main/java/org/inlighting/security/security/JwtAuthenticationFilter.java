@@ -19,25 +19,42 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    /*
+    过滤器一定要设置 AuthenticationManager，所以此处我们这么编写，这里的 AuthenticationManager
+    我会会从 Security 配置的时候传入
+    */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        /**
+         * 运行父类 UsernamePasswordAuthenticationFilter 的构造方法，能够设置改
+         * 过滤器指定访问方法为 POST [\login]
+          */
         super();
         setAuthenticationManager(authenticationManager);
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        // 从请求的 POST 中拿取 username 和 password 两个字段进行登入
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+        // 设置一些客户 IP 啥信息，后面想用的话可以用，虽然没啥用
         setDetails(request, token);
+        // 交给 AuthenticationManager 进行鉴权
         return getAuthenticationManager().authenticate(token);
     }
 
+    /*
+    鉴权成功进行的操作，我们这里设置返回加密后的 token
+    */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         handleResponse(request, response, authResult, null);
     }
 
+    /*
+    鉴权失败进行的操作，我们这里就返回用户名或密码错误
+    */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         handleResponse(request, response, null, failed);

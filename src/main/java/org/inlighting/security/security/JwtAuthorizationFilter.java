@@ -20,6 +20,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UserDetailsService userDetailsService;
 
+    // 会从 Spring Security 配置文件那里传过来
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
@@ -27,11 +28,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        // 判断是否有 token，并且进行认证
         Authentication token = getAuthentication(request);
         if (token == null) {
             chain.doFilter(request, response);
             return;
         }
+        // 认证成功
         SecurityContextHolder.getContext().setAuthentication(token);
         chain.doFilter(request, response);
     }

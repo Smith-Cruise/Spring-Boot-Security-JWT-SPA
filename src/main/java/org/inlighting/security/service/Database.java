@@ -1,10 +1,8 @@
 package org.inlighting.security.service;
 
 import org.inlighting.security.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -14,9 +12,6 @@ import java.util.Map;
 @Component
 public class Database {
     private Map<String, UserEntity> data = null;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     public Map<String, UserEntity> getDatabase() {
         if (data == null) {
@@ -39,10 +34,6 @@ public class Database {
             data.put("smith", smith);
         }
         return data;
-    }
-
-    private String getPassword(String raw) {
-        return passwordEncoder.encode(raw);
     }
 
     private Collection<GrantedAuthority> getGrants(String role) {
