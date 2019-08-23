@@ -2,21 +2,22 @@
 
 此前我已经写过一篇类似的教程，但那时候使用了投机的方法，没有尊重 Spring Security 的官方设计，自己并不感到满意。这段时间比较空，故重新研究了一遍。
 
-项目GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
+本项目 GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
 
-之前一篇文章：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md)
+老版本：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md)
 
 ## 特性
 
-* 使用 JWT 进行鉴权，支持过期控制
-* 使用 Ehcache 实现缓存，减少每次鉴权对数据库的压力
+* 使用 JWT 进行鉴权，支持 token 过期
+* 使用 Ehcache 进行缓存，减少每次鉴权对数据库的压力
 * 尽可能贴合 Spring Security 的设计
-* 实现权限的控制
+* 实现注解权限控制
 
 ## 准备
 
-*  知道 JWT 的基本概念
+开始本教程的时候希望对下面知识点进行粗略的了解。
 
+*  知道 JWT 的基本概念
 * 了解过 Spring Security
 
 我之前写过两篇关于安全框架的问题，大家可以大致看一看，打下基础。
@@ -28,9 +29,22 @@
 本项目中 `JWT` 密钥是使用用户自己的登入密码，这样每一个 `token` 的密钥都不同，相对比较安全。
 
 ### 大体思路：
-**登入：** `POST 用户名密码到 \login` -> `JwtAuthenticationFilter` -> `AuthenticationManager 鉴权` -> `从 UserDetailsService 中拿用户数据进行比较` -> `返回 token`
 
-**请求鉴权：** `任意请求` -> `JwtAuthorizationFilter` -> `有 token 则检验是否合法，没有token默认为 AnonymousUser` -> `按照权限进行相应的访问`。
+**登入：**
+
+1. POST 用户名密码到 \login
+2. 请求到达 `JwtAuthenticationFilter` 中的 `attemptAuthentication()` 方法，获取 request 中的 POST 参数，包装成一个 `UsernamePasswordAuthenticationToken` 交付给 `AuthenticationManager` 的 `authenticate()` 方法进行鉴权。
+3. `AuthenticationManager` 会从 `CachingUserDetailsService` 中查找用户信息，并且判断账号密码是否正确。
+4. 如果账号密码正确跳转到 `JwtAuthenticationFilter` 中的 `successfulAuthentication()` 方法，我们进行签名，生成 token 返回给用户。
+5. 账号密码错误则跳转到 `JwtAuthenticationFilter` 中的 `unsuccessfulAuthentication()` 方法，我们返回错误信息让用户重新登入。
+
+**请求鉴权：**
+
+请求鉴权的主要思路是我们会从请求中的 Authorization 字段拿取 token，如果不存在次字段的用户，Spring Security 会默认会用 `AnonymousAuthenticationToken()` 包装它，即代表匿名用户。
+
+1. 任意请求发起
+2. 到达 `JwtAuthorizationFilter` 中的 `doFilterInternal()` 方法，进行鉴权。
+3. 如果鉴权成功我们把生成的 `Authentication` 用 `SecurityContextHolder.getContext().setAuthentication()` 放入 Security，即代表鉴权完成。此处如何鉴权由我们自己代码编写，后序会详细说明。
 
 
 ## 准备 pom.xml
@@ -145,7 +159,7 @@
 
 ```
 
-pom.xml 配置文件这块没有什么好说的，就是用 Spring 官方的脚手架生成，主要说明下面的几个依赖：
+pom.xml 配置文件这块没有什么好说的，主要说明下面的几个依赖：
 
 ```xml
 <!-- ehcache 读取 xml 配置文件使用 -->
@@ -177,13 +191,15 @@ pom.xml 配置文件这块没有什么好说的，就是用 Spring 官方的脚�
 </dependency>
 ```
 
-因为 ehcache 读取 xml 配置文件时使用了这几个依赖，这几个依赖从 JDK 9 开始时是选配模块，所以高版本的用户需要添加这几个依赖才能正常使用。
+因为 ehcache 读取 xml 配置文件时使用了这几个依赖，而这几个依赖从 JDK 9 开始时是选配模块，所以高版本的用户需要添加这几个依赖才能正常使用。
 
 ## 基础工作准备
 
-接下来准备下几个基础工作，就是新建个实体、模拟个数据库。
+接下来准备下几个基础工作，就是新建个实体、模拟个数据库，写个 JWT 工具类这种基础操作。
 
-### UserEntity
+### UserEntity.java
+
+关于 role 为什么使用 GrantedAuthority 说明下：其实是为了简化代码，直接用了 Security 现成的 role 类，实际项目中我们肯定要自己进行处理，将其转换为 Security 的 role 类。
 
 ```java
 public class UserEntity {
@@ -226,9 +242,9 @@ public class UserEntity {
 }
 ```
 
-### ResponseEntity
+### ResponseEntity.java
 
-Spring Boot 我们统一 json 的返回格式，所以自定义一个 ResponseEntity。
+前后端分离为了方便前端我们要统一 json 的返回格式，所以自定义一个 ResponseEntity.java。
 
 ```java
 public class ResponseEntity {
@@ -274,7 +290,7 @@ public class ResponseEntity {
 }
 ```
 
-### Database
+### Database.java
 
 这里我们使用一个 HashMap 模拟了一个数据库，密码我已经预先用 `Bcrypt` 加密过了，这也是 Spring Security 官方推荐的加密算法（MD5 加密已经在 Spring Security 5 中被移除了，不安全）。
 
@@ -318,7 +334,7 @@ public class Database {
 }
 ```
 
-### UserService
+### UserService.java
 
 这里再模拟一个 service，主要就是模仿数据库的操作。
 
@@ -335,7 +351,7 @@ public class UserService {
 }
 ```
 
-### JwtUtil
+### JwtUtil.java
 
 自己编写的一个工具类，主要负责 JWT 的签名和鉴权。
 
@@ -402,11 +418,11 @@ public class JwtUtil {
 
 登入这块，我们使用自定义的 `JwtAuthenticationFilter` 来进行登入。
 
-每次请求鉴权的话，我们使用自定义的 `JwtAuthorizationFilter` 来处理。
+请求鉴权，我们使用自定义的 `JwtAuthorizationFilter` 来处理。
 
-> 也许大家觉得两个单词长的有点像，哈！
+> 也许大家觉得两个单词长的有点像，😜。
 
-### UserDetailsServiceImpl
+### UserDetailsServiceImpl.java
 
 我们首先实现官方的 `UserDetailsService` 接口，这里主要负责一个从数据库拿数据的操作。
 
@@ -428,24 +444,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 }
 ```
 
-先写这样，后序我们还需要对其进行缓存改造，不然每次请求都要从数据库拿一次数据鉴权，对数据库压力太大了。
+后序我们还需要对其进行缓存改造，不然每次请求都要从数据库拿一次数据鉴权，对数据库压力太大了。
 
-### JwtAuthenticationFilter
+### JwtAuthenticationFilter.java
 
-我们继承了 `UsernamePasswordAuthenticationFilter`，这样能大大简化我们的工作量。
+这个过滤器主要处理登入操作，我们继承了 `UsernamePasswordAuthenticationFilter`，这样能大大简化我们的工作量。
 
 ```java
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    /**
-     *  过滤器一定要设置 AuthenticationManager，所以此处我们这么编写，这里的 AuthenticationManager
-     *  我会会从 Security 配置的时候传入
-     */
+    /*
+    过滤器一定要设置 AuthenticationManager，所以此处我们这么编写，这里的 AuthenticationManager
+    我会从 Security 配置的时候传入
+    */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        /**
-         * 运行父类 UsernamePasswordAuthenticationFilter 的构造方法，能够设置改
-         * 过滤器指定访问方法为 POST [\login]
-          */
+        /*
+        运行父类 UsernamePasswordAuthenticationFilter 的构造方法，能够设置此滤器指定
+        方法为 POST [\login]
+        */
         super();
         setAuthenticationManager(authenticationManager);
     }
@@ -462,17 +478,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return getAuthenticationManager().authenticate(token);
     }
 
-    /**
-     * 鉴权成功进行的操作，我们这里设置返回加密后的 token
-     */
+    /*
+    鉴权成功进行的操作，我们这里设置返回加密后的 token
+    */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         handleResponse(request, response, authResult, null);
     }
 
-    /**
-     * 鉴权失败进行的操作，我们这里就返回用户名或密码错误
-     */
+    /*
+    鉴权失败进行的操作，我们这里就返回 用户名或密码错误 的信息
+    */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         handleResponse(request, response, null, failed);
@@ -505,9 +521,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 > `private void handleResponse()` 此处处理的方法不是很好，我的想法是跳转到控制器中进行处理，但是这样鉴权成功的 token 带不过去，所以先这么写了，有点复杂。
 
-### JwtAuthorizationFilter
+### JwtAuthorizationFilter.java
 
-这个过滤器我们继承 `BasicAuthenticationFilter` ，考虑到 Basic 认证和 JWT 比较像，就选择了它。
+这个过滤器处理每个请求鉴权，我们选择继承 `BasicAuthenticationFilter` ，考虑到 Basic 认证和 JWT 比较像，就选择了它。
 
 ```java
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
@@ -555,9 +571,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 }
 ```
 
-### SecurityConfiguration
+### SecurityConfiguration.java
 
-此处我们进行 Security 的配置，并且实现缓存功能。实现缓存这我我们使用官方现成的 `CachingUserDetailsService` ，唯独的缺点就是它没有 public 方法，我们不能正常实例化，下面代码也有详细说明。
+此处我们进行 Security 的配置，并且实现缓存功能。缓存这块我们使用官方现成的 `CachingUserDetailsService` ，唯独的缺点就是它没有 public 方法，我们不能正常实例化，需要曲线救国，下面代码也有详细说明。
 
 ```java
 // 开启 Security
@@ -581,7 +597,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // security 默认 csrf 是开启的，我们使用了 token ，这个也没有什么必要了
                 .csrf().disable()
                 .authorizeRequests()
-                // 默认所有请求通过，然后我们在需要权限的方法加上安全注解，这样比写死配置灵活很多
+                // 默认所有请求通过，但是我们要在需要权限的方法加上安全注解，这样比写死配置灵活很多
                 .anyRequest().permitAll()
                 .and()
                 // 添加自己编写的两个过滤器
@@ -600,7 +616,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         UserCache userCache = new SpringCacheBasedUserCache(cacheManager.getCache("jwt-cache"));
         cachingUserDetailsService.setUserCache(userCache);
         /*
-        security 默认鉴权完成后会把密码抹除，但是这里我们使用用户的密码来作为 JWT 的密码，
+        security 默认鉴权完成后会把密码抹除，但是这里我们使用用户的密码来作为 JWT 的生成密钥，
         如果被抹除了，在对 JWT 进行签名的时候就拿不到用户密码了，故此处关闭了自动抹除密码。
          */
         auth.eraseCredentials(false);
@@ -633,7 +649,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 ### Ehcache 配置
 
-Ehcache 3 开始，统一使用了 JCache，就是  JSR107 标准，网上很多教程都是基于 Ehcache 2 的，所以大家可能会遇到很多坑。
+Ehcache 3 开始，统一使用了 JCache，就是  JSR107 标准，网上很多教程都是基于 Ehcache 2 的，所以大家可能在参照网上的教程会遇到很多坑。
+
+> JSR107：emm，其实 JSR107 是一种缓存标准，各个框架只要遵守这个标准，就是现实大一统。差不多就是我不需要更改系统代码，也能随意更换底层的缓存系统。
 
 在 resources 目录下创建 `ehcache.xml` 文件：
 
@@ -665,9 +683,9 @@ spring.cache.jcache.config=classpath:ehcache.xml
 
 ### 统一全局异常
 
-一个 `restful` 最后的异常抛出肯定是要格式统一的，这样才方便前端的调用。
+我们要把异常的返回形式也统一了，这样才能方便前端的调用。
 
-我们平常会使用 `@RestControllerAdvice` 来统一异常，但是他只能管理 Controller 层面抛出的异常。Security 中抛出的异常不会抵达 Controller，故我们还要改造 `ErrorController` 。
+我们平常会使用 `@RestControllerAdvice` 来统一异常，但是它只能管理 Controller 层面抛出的异常。Security 中抛出的异常不会抵达 Controller，无法被 `@RestControllerAdvice` 捕获，故我们还要改造 `ErrorController` 。
 
 ```java
 @RestController
@@ -687,7 +705,7 @@ public class CustomErrorController implements ErrorController {
 
 ## 测试
 
-写个控制器试试，大家也可以参考我控制器里面获取用户信息的方式，推荐使用 `@AuthenticationPrincipal` 这个方法！！！
+写个控制器试试，大家也可以参考我控制器里面获取用户信息的方式，推荐使用 `@AuthenticationPrincipal` 这个注解！！！
 
 ```java
 @RestController
@@ -735,7 +753,7 @@ public @interface IsAdmin {
 
 ### 如何解决JWT过期问题？
 
-我们可以在 `JwtAuthorizationFilter` 中加点料，如果用户快过期了，返回个特别的状态码，前端收到此状态码去访问 `GET /re_authentication` 重新拿一个新的 token 即可。
+我们可以在 `JwtAuthorizationFilter` 中加点料，如果用户快过期了，返回个特别的状态码，前端收到此状态码去访问 `GET /re_authentication` 携带老的 token 重新拿一个新的 token 即可。
 
 ### 如何作废已颁发未过期的 token？
 

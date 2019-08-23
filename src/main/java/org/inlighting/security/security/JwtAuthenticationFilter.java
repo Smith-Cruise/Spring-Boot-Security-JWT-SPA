@@ -21,13 +21,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     /*
     过滤器一定要设置 AuthenticationManager，所以此处我们这么编写，这里的 AuthenticationManager
-    我会会从 Security 配置的时候传入
+    我会从 Security 配置的时候传入
     */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        /**
-         * 运行父类 UsernamePasswordAuthenticationFilter 的构造方法，能够设置改
-         * 过滤器指定访问方法为 POST [\login]
-          */
+        /*
+        运行父类 UsernamePasswordAuthenticationFilter 的构造方法，能够设置此滤器指定
+        方法为 POST [\login]
+        */
         super();
         setAuthenticationManager(authenticationManager);
     }
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /*
-    鉴权失败进行的操作，我们这里就返回用户名或密码错误
+    鉴权失败进行的操作，我们这里就返回 用户名或密码错误 的信息
     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {

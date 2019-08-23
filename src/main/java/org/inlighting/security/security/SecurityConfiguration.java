@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // security 默认 csrf 是开启的，我们使用了 token ，这个也没有什么必要了
                 .csrf().disable()
                 .authorizeRequests()
-                // 默认所有请求通过，然后我们在需要权限的方法加上安全注解，这样比写死配置灵活很多
+                // 默认所有请求通过，但是我们要在需要权限的方法加上安全注解，这样比写死配置灵活很多
                 .anyRequest().permitAll()
                 .and()
                 // 添加自己编写的两个过滤器
@@ -60,7 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         UserCache userCache = new SpringCacheBasedUserCache(cacheManager.getCache("jwt-cache"));
         cachingUserDetailsService.setUserCache(userCache);
         /*
-        security 默认鉴权完成后会把密码抹除，但是这里我们使用用户的密码来作为 JWT 的密码，
+        security 默认鉴权完成后会把密码抹除，但是这里我们使用用户的密码来作为 JWT 的生成密钥，
         如果被抹除了，在对 JWT 进行签名的时候就拿不到用户密码了，故此处关闭了自动抹除密码。
          */
         auth.eraseCredentials(false);
