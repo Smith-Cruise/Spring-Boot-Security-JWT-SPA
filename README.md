@@ -40,7 +40,7 @@
 
 **请求鉴权：**
 
-请求鉴权的主要思路是我们会从请求中的 Authorization 字段拿取 token，如果不存在次字段的用户，Spring Security 会默认会用 `AnonymousAuthenticationToken()` 包装它，即代表匿名用户。
+请求鉴权的主要思路是我们会从请求中的 Authorization 字段拿取 token，如果不存在此字段的用户，Spring Security 会默认会用 `AnonymousAuthenticationToken()` 包装它，即代表匿名用户。
 
 1. 任意请求发起
 2. 到达 `JwtAuthorizationFilter` 中的 `doFilterInternal()` 方法，进行鉴权。
