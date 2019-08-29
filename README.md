@@ -1,8 +1,10 @@
-# Spring Boot 2 + Spring Security 5 + JWT 的单页应用Restful解决方案
+# Spring Boot 2 + Spring Security 5 + JWT 的单页应用 Restful 解决方案
 
 此前我已经写过一篇类似的教程，但那时候使用了投机的方法，没有尊重 Spring Security 的官方设计，自己并不感到满意。这段时间比较空，故重新研究了一遍。
 
-本项目 GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
+原文地址：[https://www.inlighting.org/archives/spring-boot-security-jwt-restful.html](https://www.inlighting.org/archives/spring-boot-security-jwt-restful.html)
+
+项目 GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
 
 老版本：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA/blob/master/README_OLD.md)
 
