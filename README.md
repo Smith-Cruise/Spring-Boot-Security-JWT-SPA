@@ -2,7 +2,7 @@
 
 此前我已经写过一篇类似的教程，但那时候使用了投机的方法，没有尊重 Spring Security 的官方设计，自己并不感到满意。这段时间比较空，故重新研究了一遍。
 
-原文地址：[https://www.inlighting.org/archives/spring-boot-security-jwt-restful.html](https://www.inlighting.org/archives/spring-boot-security-jwt-restful.html)
+原文地址：[https://www.inlighting.org/2019/spring-boot-security-jwt-restful.html](https://www.inlighting.org/2019/spring-boot-security-jwt-restful.html)
 
 项目 GitHub：[https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA](https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA)
 
