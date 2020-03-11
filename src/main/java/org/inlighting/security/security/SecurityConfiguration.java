@@ -35,6 +35,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        CachingUserDetailsService cachingUserDetailsService = cachingUserDetailsService(userDetailsServiceImpl);
+        
+        // jwt-cache 我们在 ehcache.xml 配置文件中有声明
+        UserCache userCache = new SpringCacheBasedUserCache	(cacheManager.getCache("jwt-cache"));
+        cachingUserDetailsService.setUserCache(userCache);
+        
         // 开启跨域
         http.cors()
                 .and()
@@ -46,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 // 添加自己编写的两个过滤器
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), cachingUserDetailsService(userDetailsServiceImpl)))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), cachingUserDetailsService))
                 // 前后端分离是 STATELESS，故 session 使用该策略
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
