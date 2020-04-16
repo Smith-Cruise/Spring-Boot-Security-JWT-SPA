@@ -73,6 +73,11 @@ user/get
 >
 ![](https://i.imgur.com/0wB5IiK.png)
 
+# redis
+![](https://i.imgur.com/KZv2T3i.png)
+![](https://i.imgur.com/zP5MrLW.png)
+
+
 
 # 原始項目
 https://github.com/Smith-Cruise/Spring-Boot-Security-JWT-SPA
