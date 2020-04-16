@@ -1,6 +1,6 @@
 # Spring Boot 2 + Spring Security 5 + JWT 的单页应用 Restful 解决方案
 # 預計新增為..
-![](https://i.imgur.com/ZUitSUf.png)
+![](https://i.imgur.com/uK1g78i.png)
 
 ## 特性
 * 使用 JWT 進行鑑權，支持 token 過期
